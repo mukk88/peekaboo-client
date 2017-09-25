@@ -1,0 +1,41 @@
+{
+  "name": "peekaboo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/auth0-js": "^8.6.3",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/lodash": "^4.14.74",
+    "@types/material-ui": "^0.18.1",
+    "@types/react-dropzone": "^3.13.1",
+    "@types/react-router": "^4.0.15",
+    "@types/react-router-dom": "^4.0.7",
+    "@types/react-tap-event-plugin": "^0.0.30",
+    "auth0-js": "^8.10.1",
+    "aws-sdk": "^2.117.0",
+    "exif-js": "^2.3.0",
+    "load-image": "^1.0.0",
+    "lodash": "^4.17.4",
+    "material-ui": "^0.19.2",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-dropzone": "^4.1.3",
+    "react-native-exif": "^0.1.5",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-tap-event-plugin": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^20.0.8",
+    "@types/node": "^8.0.28",
+    "@types/react": "^16.0.5",
+    "@types/react-dom": "^15.5.4",
+    "react-scripts-ts": "2.7.0"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  }
+}
