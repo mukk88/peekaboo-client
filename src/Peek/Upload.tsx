@@ -13,7 +13,7 @@ import {
 } from './Common';
 
 declare function require(path: string): IExif;
-const exif = require('/home/mark/personal/peekaboo/node_modules/exif-js/exif.js');
+const exif = require('../../node_modules/exif-js/exif.js');
 
 interface IExif {
   getData: Function;
