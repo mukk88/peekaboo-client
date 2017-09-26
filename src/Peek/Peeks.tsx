@@ -6,12 +6,10 @@ import { grey500 } from 'material-ui/styles/colors';
 import {
   IMediaData
 } from './Common';
-import {
-  ImageHolder
-} from './ImageHolder';
+import { MediaGroup } from './MediaGroup';
 
 interface IPeeksState {
-  mediaData: IMediaData[];
+  mediaData: IMediaData[][];
   loadingState: LoadingStates;
 }
 
@@ -45,8 +43,23 @@ export class Peeks extends React.Component<{}, IPeeksState> {
   async componentDidMount() {
 
     const response = await getAllPeeks();
+    const groupedMediaData: IMediaData[][] = [[]];
+    _.each(response, mediaData => {
+      if (groupedMediaData[0].length === 0) {
+        groupedMediaData[0].push(mediaData);
+        return;
+      }
+      const lastArray = groupedMediaData[groupedMediaData.length - 1];
+      const lastItem = lastArray[lastArray.length - 1];
+      if (lastItem.date === mediaData.date) {
+        lastArray.push(mediaData);
+      } else {
+        groupedMediaData.push([mediaData]);
+      }
+    });
+    // const groupedMediaData = _.groupBy<IMediaData, string>(response, mediaData => mediaData.date);
     this.setState({
-      mediaData: response,
+      mediaData: groupedMediaData,
       loadingState: LoadingStates.LOAD_SUCCESS,
     });
   }
@@ -62,17 +75,10 @@ export class Peeks extends React.Component<{}, IPeeksState> {
       );
     }
 
-    const images = _.map(this.state.mediaData, mediaData => {
-      if (!mediaData.token) {
-        return <div />;
-      }
+    const images = _.map(this.state.mediaData, mediaDataArray => {
       return (
-        <ImageHolder
-          key={mediaData.token}
-          token={mediaData.token}
-          orientation={mediaData.orientation}
-          date={mediaData.date}
-          comment={mediaData.comment}
+        <MediaGroup
+          mediaData={mediaDataArray}
         />
       );
     });
@@ -81,7 +87,7 @@ export class Peeks extends React.Component<{}, IPeeksState> {
       <div>
         {images}
         <div style={{textAlign: 'center'}}>
-          <FontIcon className="material-icons" color={grey500} style={birthIconStyle}>airline_seat_flat</FontIcon>
+          <FontIcon className="material-icons" color={grey500} style={birthIconStyle}>child_care</FontIcon>
           <div style={{fontSize: '1.2em'}}>
             Liv was born.
           </div>

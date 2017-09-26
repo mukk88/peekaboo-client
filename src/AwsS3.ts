@@ -47,6 +47,14 @@ export function uploadObject(key: string, obj: string | Blob) {
   });
 }
 
+export function getPreSignedUrl(key: string) {
+  const params = {
+    Bucket: albumBucketName, 
+    Key: key
+   };
+  return s3.getSignedUrl('getObject', params);
+}
+
 export function getObjectFromS3(key: string) {  
   return new Promise((resolve, reject) => {
     const params = {

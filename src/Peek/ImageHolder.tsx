@@ -46,19 +46,13 @@ export class ImageHolder extends React.Component<IImageHolderProps, IImageHolder
   
   render() {
 
-    const isRotated = this.props.orientation === 1 || this.props.orientation === 3;
-
-    const marginTopStyle = !isRotated ? {
-      marginTop: '50px',
-    } : {};
-
     const rotateStyle: React.CSSProperties = {
       transform: `rotate(${transformMapping[this.props.orientation]}deg)`,
       width: '100%',
-      ...marginTopStyle,
+      marginTop: '50px',
     };
     const containerStyle: React.CSSProperties = {
-      height: isRotated ? 'auto' : screen.width,
+      height: '425px',
       ...centerStyle
     };
     const rootStyle: React.CSSProperties = {

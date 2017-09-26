@@ -4540,6 +4540,10 @@ react-event-listener@^0.4.5:
     prop-types "^15.5.4"
     warning "^3.0.0"
 
+react-fullscreen@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-fullscreen/-/react-fullscreen-0.1.0.tgz#aab68d6d34aadb261975959697ad240c8fae1e50"
+
 react-native-exif@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/react-native-exif/-/react-native-exif-0.1.5.tgz#795ea1a524a8dbecb5ed38916ea628b76601a971"

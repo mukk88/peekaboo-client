@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import FlatButton from 'material-ui/FlatButton'; 
 import TextField from 'material-ui/TextField';
+import DatePicker from 'material-ui/DatePicker';
 import * as Dropzone from 'react-dropzone';
 import { ImageFile } from 'react-dropzone';
 import {
@@ -29,6 +30,14 @@ interface IExifData {
 interface IUploadState {
   mediaData: IMediaData[];
   uploadingStatus: string;
+}
+
+function isVideoType(fileName: string) {
+  const ext = fileName.split('.').pop();
+  if (ext === 'jpg' || ext === 'png') {
+    return false;
+  } 
+  return true;
 }
 
 function getExifData(file: ImageFile): Promise<IExifData> {
@@ -116,27 +125,32 @@ export class Upload extends React.Component<{}, IUploadState> {
       if (commentInput) {
         data.comment = commentInput.value;
       }
+      const dateInput = document.getElementById(`date-${data.name}`) as HTMLInputElement;
+      if (dateInput) {
+        data.date = `${dateInput.value}T00:00:00Z`;
+      }
       const canvas = document.createElement('canvas');
-      const img = document.getElementById(data.name) as HTMLImageElement;
+      const img = document.getElementById(data.name) as HTMLVideoElement;
+      const extension = data.name.split('.').pop();
       if (img) {
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = data.isVideo ? img.videoWidth : img.width;
+        canvas.height = data.isVideo ? img.videoHeight : img.height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          ctx.drawImage(img, 0, 0, img.width, img.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const blob = canvas.toDataURL('image/jpeg');
           this.setState({
             uploadingStatus: `uploading ${i + 1} of ${this.state.mediaData.length}..`
           });
           const token = await postPeekaboo(data);
           if (!token) {
-            // alert('could not upload, please try again');
+            alert('could not upload, please try again');
             continue;
           }
           let response = await uploadObject(`liv/thumbs/${token}.jpg`, blob);
           // check for errors
           console.log(response);
-          response = await uploadObject(`liv/${token}.jpg`, data.blob);
+          response = await uploadObject(`liv/${token}.${extension}`, data.blob);
           console.log(response);
         }
       } 
@@ -153,13 +167,15 @@ export class Upload extends React.Component<{}, IUploadState> {
       const exifData = await getExifData(files[i]);
       const dateString = exifData.dateString.split(' ')[0].split(':').join('-');
       const blob = await readFile(files[i]);
+      const isVideo = isVideoType(files[i].name);
       blobs.push({
         blob,
         name: files[i].name,
         date: `${dateString}T00:00:00Z`,
-        isVideo: false,
+        isVideo,
         comment: '',
         orientation: exifData.orientation,
+        token: '',
       });
     }
     this.setState({
@@ -173,28 +189,56 @@ export class Upload extends React.Component<{}, IUploadState> {
       const rotateStyle: React.CSSProperties = {
         transform: `rotate(${transformMapping[data.orientation]}deg)`,
       };
+
+      const visibleThumb = data.isVideo ? (
+        <video
+          src={window.URL.createObjectURL(data.blob)}
+          height={'250px'}
+          style={rotateStyle}
+          controls={true}
+        />
+      ) : (
+        <img
+          src={window.URL.createObjectURL(data.blob)}
+          height={'250px'}
+          style={rotateStyle}
+        />
+      );
+
+      const invisibleThumb = data.isVideo ? (
+        <video
+          id={data.name}
+          src={window.URL.createObjectURL(data.blob)}
+          height={'425px'}
+          style={{...rotateStyle}}
+          controls={true}
+        />
+      ) : (
+        <img
+          id={data.name}
+          src={window.URL.createObjectURL(data.blob)}
+          height={'425px'}
+          style={{...rotateStyle}}
+        />
+      );
+
       return (
         <div key={data.name} style={{textAlign: 'center'}}>
           <div style={{overflow: 'hidden'}}>
-            <div style={{overflow: 'hidden', height: '1px'}}>
-              <img
-                id={data.name}
-                src={window.URL.createObjectURL(data.blob)}
-                height={'425px'}
-                style={{...rotateStyle, visibility: 'hidden'}}
-              />
+            <div style={{overflow: 'hidden', height: '0px'}}>
+              {invisibleThumb}
             </div>
-            <img
-              id={data.name}
-              src={window.URL.createObjectURL(data.blob)}
-              height={'250px'}
-              style={rotateStyle}
-            />
+            {visibleThumb}
           </div>
           <div>
             <TextField
               hintText="Enter comment"
               id={`cmt-${data.name}`}
+            />
+            <DatePicker
+              id={`date-${data.name}`}
+              autoOk={true}
+              defaultDate={new Date(data.date)}
             />
           </div>
         </div>

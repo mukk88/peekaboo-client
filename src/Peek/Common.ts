@@ -5,7 +5,7 @@ export interface IMediaData {
   isVideo: boolean;
   comment: string;
   orientation: number;
-  token?: string;
+  token: string;
 }
 
 export const transformMapping = {
