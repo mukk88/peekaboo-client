@@ -17,8 +17,6 @@ const s3 = new AWS.S3({
   params: {Bucket: albumBucketName}
 });
 
-export const s3Endpoint = 'https://s3-ap-southeast-1.amazonaws.com/peekaboos/';
-
 export function getObjectsFromS3(): Promise<ListObjectsOutput> {
   return new Promise((resolve, reject) => {
     s3.listObjects({Bucket: albumBucketName}, (err, data) => {
@@ -28,12 +26,6 @@ export function getObjectsFromS3(): Promise<ListObjectsOutput> {
       resolve(data);
     });
   });
-}
-
-export function getObjectUrlFromS3(key: string): string {
-  const params = {Bucket: albumBucketName, Key: key, Expires: 60};
-  const url = s3.getSignedUrl('getObject', params);
-  return url;
 }
 
 export function uploadObject(key: string, obj: string | Blob) {
@@ -47,33 +39,18 @@ export function uploadObject(key: string, obj: string | Blob) {
   });
 }
 
-export function getPreSignedUrl(key: string) {
+export function getPreSignedUrl(key: string): Promise<string> {
   const params = {
     Bucket: albumBucketName, 
     Key: key
    };
-  return s3.getSignedUrl('getObject', params);
-}
 
-export function getObjectFromS3(key: string) {  
   return new Promise((resolve, reject) => {
-    const params = {
-      Bucket: albumBucketName, 
-      Key: key
-     };
-    s3.getObject(params, (err, data) => {
+    s3.getSignedUrl('getObject', params, (err, url) => {
       if (err) {
         reject(err);
       }
-      resolve(data);
+      resolve(url);
     });
   });
-}
-
-export async function getThumbnailFromS3(key: string) {
-
-  const data = await getObjectFromS3(key);
-  // tslint:disable-next-line
-  const data2 = data as any;
-  return data2.Body;
 }

@@ -49,6 +49,7 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
 
     const mediaDiv = currentMedia.isVideo ? (
       <VideoHolder
+        key={currentMedia.token}
         token={currentMedia.token}
         orientation={currentMedia.orientation}
         date={currentMedia.date}
@@ -57,6 +58,7 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
       />
     ) : (
       <ImageHolder
+        key={currentMedia.token}
         token={currentMedia.token}
         orientation={currentMedia.orientation}
         date={currentMedia.date}

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { 
-  getThumbnailFromS3,
   getPreSignedUrl,
 } from '../AwsS3';
 import FontIcon from 'material-ui/FontIcon';
@@ -59,15 +58,15 @@ export class VideoHolder extends React.Component<IVideoHolderProps, IVideoHolder
   }
 
   async componentDidMount() {
-    const thumbNail = await getThumbnailFromS3(`liv/thumbs/${this.props.token}.jpg`);
+    const thumbNail = await getPreSignedUrl(`liv/thumbs/${this.props.token}.jpg`);
     this.setState({
       thumbNail,
     });
   }
 
-  loadVideo() {
+  async loadVideo() {
     const extension = this.props.name.split('.').pop();
-    const videoUrl = getPreSignedUrl(`liv/${this.props.token}.${extension}`);
+    const videoUrl = await getPreSignedUrl(`liv/${this.props.token}.${extension}`);
     this.setState({
       videoState: VideoStates.LOADED,
       videoUrl,

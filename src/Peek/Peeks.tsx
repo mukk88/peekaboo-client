@@ -6,6 +6,7 @@ import { grey500 } from 'material-ui/styles/colors';
 import {
   IMediaData
 } from './Common';
+import { baseUri } from '../Config'; 
 import { MediaGroup } from './MediaGroup';
 
 interface IPeeksState {
@@ -20,7 +21,7 @@ const birthIconStyle: React.CSSProperties = {
 
 async function getAllPeeks(): Promise<IMediaData[]> {
   try {
-    const response = await fetch('http://localhost:6060/peekaboo');
+    const response = await fetch(`${baseUri}/peekaboo`);
     if (response.status !== 200) {
       return [];
     }

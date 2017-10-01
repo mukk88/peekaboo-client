@@ -5,6 +5,7 @@ import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import * as Dropzone from 'react-dropzone';
 import { ImageFile } from 'react-dropzone';
+import { baseUri } from '../Config';
 import {
   uploadObject,
 } from '../AwsS3';
@@ -34,7 +35,9 @@ interface IUploadState {
 
 function isVideoType(fileName: string) {
   const ext = fileName.split('.').pop();
-  if (ext === 'jpg' || ext === 'png') {
+  if (ext === 'jpg' || ext === 'png' ||
+      ext === 'JPG' || ext === 'PNG' ||
+      ext === 'JPEG' || ext === 'jpeg') {
     return false;
   } 
   return true;
@@ -75,12 +78,12 @@ function readFile(file: ImageFile): Promise<Blob> {
 
 async function postPeekaboo(data: IMediaData) {
   const dataToSend = {
-    baby: 'Liv',
+    baby: 'liv',
     ...data
   };
   let response;
   try {
-    response = await fetch('http://localhost:6060/peekaboo', {
+    response = await fetch(`${baseUri}/peekaboo`, {
       method: 'POST',
       body: JSON.stringify(dataToSend),
     });
@@ -92,6 +95,26 @@ async function postPeekaboo(data: IMediaData) {
   }
   const body = await response.json();
   return body.Token;
+}
+
+async function generatePeekabooThumb(data: IMediaData, token: string) {
+  const dataToSend = {
+    baby: 'liv',
+    ...data
+  };
+  let response;
+  try {
+    response = await fetch(`${baseUri}/peekaboo/${token}/thumb`, {
+      method: 'POST',
+      body: JSON.stringify(dataToSend),
+    });
+    if (response.status !== 200) {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+  return true;
 }
 
 const dropZoneStyle: React.CSSProperties = {
@@ -119,6 +142,8 @@ export class Upload extends React.Component<{}, IUploadState> {
   }
 
   async uploadFiles() {
+    const totalToUpload = this.state.mediaData.length;
+    let uploadedSoFar = 0;
     for (let i = 0; i < this.state.mediaData.length; i++) {
       const data = this.state.mediaData[i];
       const commentInput = document.getElementById(`cmt-${data.name}`) as HTMLInputElement;
@@ -129,34 +154,26 @@ export class Upload extends React.Component<{}, IUploadState> {
       if (dateInput) {
         data.date = `${dateInput.value}T00:00:00Z`;
       }
-      const canvas = document.createElement('canvas');
-      const img = document.getElementById(data.name) as HTMLVideoElement;
+      this.setState({
+        uploadingStatus: `uploading ${i + 1} of ${this.state.mediaData.length}..`
+      });
+      const token = await postPeekaboo(data);
+      if (!token) {
+        alert('could not upload, please try again');
+        break;
+      }
       const extension = data.name.split('.').pop();
-      if (img) {
-        canvas.width = data.isVideo ? img.videoWidth : img.width;
-        canvas.height = data.isVideo ? img.videoHeight : img.height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const blob = canvas.toDataURL('image/jpeg');
-          this.setState({
-            uploadingStatus: `uploading ${i + 1} of ${this.state.mediaData.length}..`
-          });
-          const token = await postPeekaboo(data);
-          if (!token) {
-            alert('could not upload, please try again');
-            continue;
-          }
-          let response = await uploadObject(`liv/thumbs/${token}.jpg`, blob);
-          // check for errors
-          console.log(response);
-          response = await uploadObject(`liv/${token}.${extension}`, data.blob);
-          console.log(response);
-        }
-      } 
+      const response = await uploadObject(`liv/${token}.${extension}`, data.blob);
+      console.log(response);
+      const generatedThumb = await generatePeekabooThumb(data, token);
+      if (!generatedThumb) {
+        alert('could not generated thumbnail, please try again');
+        break;
+      }
+      uploadedSoFar = i + 1;
     }
     this.setState({
-      uploadingStatus: '',
+      uploadingStatus: `uploaded ${uploadedSoFar}/${totalToUpload}`,
       mediaData: [],
     });
   }
@@ -187,7 +204,7 @@ export class Upload extends React.Component<{}, IUploadState> {
 
     const imgs = _.map(this.state.mediaData, data => {
       const rotateStyle: React.CSSProperties = {
-        transform: `rotate(${transformMapping[data.orientation]}deg)`,
+        WebkitTransform: `rotate(${transformMapping[data.orientation]}deg)`,
       };
 
       const visibleThumb = data.isVideo ? (
@@ -204,30 +221,10 @@ export class Upload extends React.Component<{}, IUploadState> {
           style={rotateStyle}
         />
       );
-
-      const invisibleThumb = data.isVideo ? (
-        <video
-          id={data.name}
-          src={window.URL.createObjectURL(data.blob)}
-          height={'425px'}
-          style={{...rotateStyle}}
-          controls={true}
-        />
-      ) : (
-        <img
-          id={data.name}
-          src={window.URL.createObjectURL(data.blob)}
-          height={'425px'}
-          style={{...rotateStyle}}
-        />
-      );
-
+      
       return (
         <div key={data.name} style={{textAlign: 'center'}}>
           <div style={{overflow: 'hidden'}}>
-            <div style={{overflow: 'hidden', height: '0px'}}>
-              {invisibleThumb}
-            </div>
             {visibleThumb}
           </div>
           <div>

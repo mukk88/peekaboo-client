@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { 
-  getThumbnailFromS3,
-  // getObjectFromS3,
+  getPreSignedUrl,
 } from '../AwsS3';
 import {
   transformMapping
@@ -38,7 +37,7 @@ export class ImageHolder extends React.Component<IImageHolderProps, IImageHolder
   }
 
   async componentDidMount() {
-    const thumbNail = await getThumbnailFromS3(`liv/thumbs/${this.props.token}.jpg`);
+    const thumbNail = await getPreSignedUrl(`liv/thumbs/${this.props.token}.jpg`);
     this.setState({
       thumbNail,
     });
@@ -47,8 +46,9 @@ export class ImageHolder extends React.Component<IImageHolderProps, IImageHolder
   render() {
 
     const rotateStyle: React.CSSProperties = {
-      transform: `rotate(${transformMapping[this.props.orientation]}deg)`,
-      width: '100%',
+      WebkitTransform: `rotate(${transformMapping[this.props.orientation]}deg)`,
+      maxWidth: '100%',
+      maxHeight: '425px',
       marginTop: '50px',
     };
     const containerStyle: React.CSSProperties = {
