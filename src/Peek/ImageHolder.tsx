@@ -53,6 +53,7 @@ export class ImageHolder extends React.Component<IImageHolderProps, IImageHolder
     };
     const containerStyle: React.CSSProperties = {
       height: '425px',
+      overflowY: 'hidden',
       ...centerStyle
     };
     const rootStyle: React.CSSProperties = {

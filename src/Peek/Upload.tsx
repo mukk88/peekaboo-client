@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import FlatButton from 'material-ui/FlatButton'; 
 import TextField from 'material-ui/TextField';
-import DatePicker from 'material-ui/DatePicker';
 import * as Dropzone from 'react-dropzone';
 import { ImageFile } from 'react-dropzone';
 import { baseUri } from '../Config';
@@ -150,10 +149,6 @@ export class Upload extends React.Component<{}, IUploadState> {
       if (commentInput) {
         data.comment = commentInput.value;
       }
-      const dateInput = document.getElementById(`date-${data.name}`) as HTMLInputElement;
-      if (dateInput) {
-        data.date = `${dateInput.value}T00:00:00Z`;
-      }
       this.setState({
         uploadingStatus: `uploading ${i + 1} of ${this.state.mediaData.length}..`
       });
@@ -231,11 +226,6 @@ export class Upload extends React.Component<{}, IUploadState> {
             <TextField
               hintText="Enter comment"
               id={`cmt-${data.name}`}
-            />
-            <DatePicker
-              id={`date-${data.name}`}
-              autoOk={true}
-              defaultDate={new Date(data.date)}
             />
           </div>
         </div>

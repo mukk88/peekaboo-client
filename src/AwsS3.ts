@@ -1,7 +1,8 @@
+import { bucket } from './Config';
 import * as AWS from 'aws-sdk';
 import { ListObjectsOutput } from 'aws-sdk/clients/s3';
 
-var albumBucketName = 'peekaboos';
+var albumBucketName = bucket;
 var bucketRegion = 'ap-southeast-1';
 var IdentityPoolId = 'ap-southeast-1:d1e44f27-050b-4d53-b38d-8ce553977bef';
 
@@ -29,6 +30,7 @@ export function getObjectsFromS3(): Promise<ListObjectsOutput> {
 }
 
 export function uploadObject(key: string, obj: string | Blob) {
+  console.log(albumBucketName);
   return new Promise((resolve, reject) => {
     s3.upload({Bucket: albumBucketName, Key: key, Body: obj}, (err, data) => {
       if (err) {

@@ -90,6 +90,7 @@ export class VideoHolder extends React.Component<IVideoHolderProps, IVideoHolder
       height: '425px',
       ...centerStyle,
       position: 'relative',
+      overflowY: 'hidden',
     };
     const rootStyle: React.CSSProperties = {
       paddingTop: '1em',
