@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
+import { RouteComponentProps, withRouter } from 'react-router';
 import FlatButton from 'material-ui/FlatButton'; 
 import TextField from 'material-ui/TextField';
 import * as Dropzone from 'react-dropzone';
@@ -75,9 +76,9 @@ function readFile(file: ImageFile): Promise<Blob> {
   });
 }
 
-async function postPeekaboo(data: IMediaData) {
+async function postPeekaboo(baby: string, data: IMediaData) {
   const dataToSend = {
-    baby: 'liv',
+    baby,
     ...data
   };
   let response;
@@ -96,9 +97,9 @@ async function postPeekaboo(data: IMediaData) {
   return body.Token;
 }
 
-async function generatePeekabooThumb(data: IMediaData, token: string) {
+async function generatePeekabooThumb(baby: string, data: IMediaData, token: string) {
   const dataToSend = {
-    baby: 'liv',
+    baby,
     ...data
   };
   let response;
@@ -128,10 +129,10 @@ const uploadButtonStyle: React.CSSProperties = {
   marginTop: '-5px',
 };
 
-export class Upload extends React.Component<{}, IUploadState> {
+class Upload extends React.Component<RouteComponentProps<{baby: string}>, IUploadState> {
 
-  constructor() {
-    super();
+  constructor(props: RouteComponentProps<{baby: string}>) {
+    super(props);
     this.state = {
       mediaData: [],
       uploadingStatus: '',
@@ -152,15 +153,15 @@ export class Upload extends React.Component<{}, IUploadState> {
       this.setState({
         uploadingStatus: `uploading ${i + 1} of ${this.state.mediaData.length}..`
       });
-      const token = await postPeekaboo(data);
+      const token = await postPeekaboo(this.props.match.params.baby, data);
       if (!token) {
         alert('could not upload, please try again');
         break;
       }
       const extension = data.name.split('.').pop();
-      const response = await uploadObject(`liv/${token}.${extension}`, data.blob);
+      const response = await uploadObject(`${this.props.match.params.baby}/${token}.${extension}`, data.blob);
       console.log(response);
-      const generatedThumb = await generatePeekabooThumb(data, token);
+      const generatedThumb = await generatePeekabooThumb(this.props.match.params.baby, data, token);
       if (!generatedThumb) {
         alert('could not generated thumbnail, please try again');
         break;
@@ -252,3 +253,5 @@ export class Upload extends React.Component<{}, IUploadState> {
     );
   }
 }
+
+export default withRouter(Upload);

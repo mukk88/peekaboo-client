@@ -2,11 +2,11 @@ import * as React from 'react';
 import FontIcon from 'material-ui/FontIcon';
 import { grey500, lightBlue100 } from 'material-ui/styles/colors';
 import { IMediaData } from './Common';
-import { ImageHolder } from './ImageHolder';
-import { VideoHolder } from './VideoHolder';
+import { MediaHolder } from './MediaHolder';
 
 interface IMediaGroupProps {
   mediaData: IMediaData[];
+  baby: string;
 } 
 
 interface IMediaGroupState {
@@ -47,22 +47,11 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
       return <div />;
     }
 
-    const mediaDiv = currentMedia.isVideo ? (
-      <VideoHolder
+    const mediaDiv = (
+      <MediaHolder
+        {...currentMedia}
         key={currentMedia.token}
-        token={currentMedia.token}
-        orientation={currentMedia.orientation}
-        date={currentMedia.date}
-        comment={currentMedia.comment}
-        name={currentMedia.name}
-      />
-    ) : (
-      <ImageHolder
-        key={currentMedia.token}
-        token={currentMedia.token}
-        orientation={currentMedia.orientation}
-        date={currentMedia.date}
-        comment={currentMedia.comment}
+        baby={this.props.baby}
       />
     );
 

@@ -30,8 +30,8 @@ export function Login(props: { auth: Auth }) {
     <Paper zDepth={2} style={paperStyles}>
       <Card expanded={true} style={cardStyles}>
           <CardHeader
-            title="Peekaboo"
-            subtitle="Liv"
+            title="Photo Store"
+            subtitle="remarkabelle"
           />
           <CardText>
             <div style={signInStyle}>

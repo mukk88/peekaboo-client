@@ -35,10 +35,11 @@ class App extends React.Component {
                 }}
               />
               <Route
-                path="/"
-                render={() => {
+                path="/baby/:baby"
+                render={(props) => {
                   return (
                     <Header
+                      routerProps={props}
                       auth={auth}
                     />
                   );
