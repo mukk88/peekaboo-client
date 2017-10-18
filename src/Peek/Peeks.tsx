@@ -76,9 +76,10 @@ class Peeks extends React.Component<RouteComponentProps<{ baby: string }>, IPeek
       );
     }
 
-    const images = _.map(this.state.mediaData, mediaDataArray => {
+    const images = _.map(this.state.mediaData, (mediaDataArray, index) => {
       return (
         <MediaGroup
+          key={`media${index}`}
           baby={this.props.match.params.baby}
           mediaData={mediaDataArray}
         />

@@ -30,7 +30,6 @@ export function getObjectsFromS3(): Promise<ListObjectsOutput> {
 }
 
 export function uploadObject(key: string, obj: string | Blob) {
-  console.log(albumBucketName);
   return new Promise((resolve, reject) => {
     s3.upload({Bucket: albumBucketName, Key: key, Body: obj}, (err, data) => {
       if (err) {

@@ -1,10 +1,20 @@
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import { grey400, lightBlue100 } from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import { 
   getPreSignedUrl,
 } from '../AwsS3';
 import { BabyData } from './BabyData';
+import { EditMode } from './EditMode';
+import {
+  IMediaData,
+  mediaStyle,
+  rootStyle,
+  playButtonStyle,
+  daysSinceStyle,
+  containerStyle,
+  helperStyle
+} from './Common';
 
 enum VideoStates {
   NOT_SHOWING,
@@ -12,15 +22,16 @@ enum VideoStates {
   LOADED,
 }
 
-interface IMediaHolderProps {
-    token: string;
-    orientation: number;
-    date: string;
-    comment: string;
+interface IMediaHolderProps2 {
+    onLeftClick: Function;
+    onRightClick: Function;
+    canLeft: boolean;
+    canRight: boolean;
     baby: string;
-    isVideo: boolean;
-    name: string;
+    thumb: string;
 }
+
+type IMediaHolderProps = IMediaHolderProps2 & IMediaData;
 
 interface IMediaHolderState {
   thumbNail: string;
@@ -29,52 +40,11 @@ interface IMediaHolderState {
   videoState: VideoStates;
   videoUrl: string;
 }
-
-const centerStyle: React.CSSProperties = {
-  textAlign: 'center',
-};
-
-const daysSinceStyle: React.CSSProperties = {
-  padding: '0.5em',
-};
-
-const mediaStyle: React.CSSProperties = {
-  maxWidth: '100%',
-  maxHeight: '425px',
-  verticalAlign: 'middle',
-};
-
-const helperStyle: React.CSSProperties = {
-  display: 'inline-block',
-  height: '100%',
-  verticalAlign: 'middle',
-};
-
-const containerStyle: React.CSSProperties = {
-  height: '425px',
-  ...centerStyle,
-  whiteSpace: 'nowrap',
-  margin: '1em 0',
-};
-
-const rootStyle: React.CSSProperties = {
-  paddingTop: '1em',
-  ...centerStyle,
-};
-
-const playButtonStyle: React.CSSProperties = {
-  cursor: 'pointer',
-  zIndex: 99,
-  color: 'white',
-  fontSize: '3em',
-  position: 'absolute',
-  opacity: 0.85,
-};
-
 export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolderState> {
 
   constructor(props: IMediaHolderProps) {
     super(props);
+    
     this.state = {
       thumbNail: '',
       editMode: false,
@@ -85,16 +55,9 @@ export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolder
     this.loadVideo = this.loadVideo.bind(this);
   }
 
-  async componentDidMount() {
-    const thumbNail = await getPreSignedUrl(`${this.props.baby}/thumbs/${this.props.token}.jpg`);
+  changeEditMode = (editMode: boolean) => {
     this.setState({
-      thumbNail,
-    });
-  }
-
-  toEditMode = () => {
-    this.setState({
-      editMode: true
+      editMode
     });
   }
 
@@ -115,12 +78,23 @@ export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolder
   }
   
   render() {
+  
+    if (this.state.editMode) {
+      return (
+        <EditMode 
+          changeEditMode={this.changeEditMode}
+          objData={this.props}
+          baby={this.props.baby}
+        />
+      );
+    }
+
     let displayedVideo = <div />;
     
     switch (this.state.videoState) {
       case VideoStates.NOT_SHOWING: {
         displayedVideo = (
-          <img src={this.state.thumbNail} style={mediaStyle} onClick={this.loadVideoAsync} />
+          <img src={this.props.thumb} style={mediaStyle} onClick={this.loadVideoAsync} />
         );
         break;
       }
@@ -143,15 +117,8 @@ export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolder
 
     const displayedDiv = this.props.isVideo ? (
       displayedVideo
-    ) : this.state.editMode ? (
-      <div>
-        <TextField
-          hintText="Edit comment"
-          value={this.props.comment}
-        />
-      </div>
     ) : (
-      <img src={this.state.thumbNail} style={mediaStyle}/>
+      <img src={this.props.thumb} style={mediaStyle}/>
     );
 
     const playButton = this.props.isVideo ? (
@@ -159,15 +126,53 @@ export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolder
     ) : (
       <span />
     );
+
+    const leftButton = (
+      <FontIcon
+        style={{marginRight: '1em'}}
+        className="material-icons"
+        color={this.props.canLeft ? lightBlue100 : grey400}
+        onClick={() => this.props.onLeftClick()}
+      >
+        keyboard_arrow_left
+      </FontIcon>
+    );
+
+    const rightButton = (
+      <FontIcon
+        style={{marginLeft: '1em'}}
+        className="material-icons"
+        color={this.props.canRight ? lightBlue100 : grey400}
+        onClick={() => this.props.onRightClick()}
+      >
+        keyboard_arrow_right
+      </FontIcon>
+    );
     
     const mediaDate = new Date(this.props.date);
     const timeDiff = mediaDate.getTime() - this.state.babyBirthday.getTime();
     const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
     
     return (
-      <div onDoubleClick={this.toEditMode} style={rootStyle}>
-        <div style={daysSinceStyle}>
-          {`Day ${diffDays}`}
+      <div style={rootStyle} >
+        <div style={{...daysSinceStyle, verticalAlign: 'middle'}}>
+          {leftButton}
+          <span>
+            {`Day ${diffDays}, ${this.props.date.split('T')[0]}`}
+          </span>
+          <div 
+            onClick={() => this.changeEditMode(true)}
+            style={{verticalAlign: 'middle', display: 'inline-block'}}
+          >
+            <FontIcon
+              className="material-icons"
+              color={grey400}
+              style={{margin: '0 0 0.3em 0.5em'}}
+            >
+              edit
+            </FontIcon>
+          </div>
+          {rightButton}
         </div>
         <div style={containerStyle}>
           {playButton}

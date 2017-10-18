@@ -156,15 +156,16 @@ class Upload extends React.Component<RouteComponentProps<{baby: string}>, IUploa
       const token = await postPeekaboo(this.props.match.params.baby, data);
       if (!token) {
         alert('could not upload, please try again');
-        break;
+        continue;
       }
       const extension = data.name.split('.').pop();
-      const response = await uploadObject(`${this.props.match.params.baby}/${token}.${extension}`, data.blob);
+      const response = await uploadObject(
+        `${this.props.match.params.baby}/${token}.${extension}`, data.blob || new Blob());
       console.log(response);
       const generatedThumb = await generatePeekabooThumb(this.props.match.params.baby, data, token);
       if (!generatedThumb) {
         alert('could not generated thumbnail, please try again');
-        break;
+        continue;
       }
       uploadedSoFar = i + 1;
     }
