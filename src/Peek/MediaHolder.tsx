@@ -29,6 +29,7 @@ interface IMediaHolderProps2 {
     canRight: boolean;
     baby: string;
     thumb: string;
+    visible: boolean;
 }
 
 type IMediaHolderProps = IMediaHolderProps2 & IMediaData;
@@ -115,7 +116,9 @@ export class MediaHolder extends React.Component<IMediaHolderProps, IMediaHolder
       }
     }
 
-    const displayedDiv = this.props.isVideo ? (
+    const displayedDiv = !this.props.visible ? (
+      <div />
+    ) : this.props.isVideo ? (
       displayedVideo
     ) : (
       <img src={this.props.thumb} style={mediaStyle}/>

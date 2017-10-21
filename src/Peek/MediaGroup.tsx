@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import Swipe from 'react-swipe-component';
+import VisibilitySensor from 'react-visibility-sensor';
 import { IMediaData } from './Common';
 import { MediaHolder } from './MediaHolder';
 import { getPreSignedUrl } from '../AwsS3';
@@ -13,6 +14,8 @@ interface IMediaGroupProps {
 interface IMediaGroupState {
   index: number;
   thumbNails: string[];
+  visible: boolean;
+  loaded: boolean;
 }
 
 export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupState> {
@@ -22,10 +25,13 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
     this.state = {
       index: 0,
       thumbNails: _.map(this.props.mediaData, data => ''),
+      visible: false,
+      loaded: false,
     };
+    this.load.bind(this);
   }
-  async componentDidMount() {
 
+  async load() {
     const thumbNails = [];
     for (let i = 0; i < this.props.mediaData.length; i++) {
       const data = this.props.mediaData[i];
@@ -35,6 +41,7 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
     
     this.setState({
       thumbNails,
+      loaded: true
     });
   }
 
@@ -48,6 +55,19 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
     this.setState({
       index: Math.min(this.props.mediaData.length - 1, this.state.index + 1),
     });
+  }
+
+  onVisibleChanged = (visible: boolean) => {
+    this.setState(
+      {
+        visible,
+      }, 
+      () => {
+        if (this.state.visible && !this.state.loaded) {
+          this.load();
+        }
+      }
+    );
   }
 
   render() {
@@ -69,11 +89,14 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
         key={currentMedia.token}
         baby={this.props.baby}
         thumb={currentThumb}
+        visible={this.state.visible}
       />
     );
 
     return (
-      <div
+      <VisibilitySensor
+          onChange={this.onVisibleChanged}
+          partialVisibility={true}
       >
         <Swipe
           onSwipedLeft={this.onRightTap}
@@ -82,7 +105,7 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
         >
           {mediaDiv}
         </Swipe>
-      </div>
+      </VisibilitySensor>
     );
   }
 }    

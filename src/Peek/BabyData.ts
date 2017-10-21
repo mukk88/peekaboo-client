@@ -4,5 +4,8 @@ export const BabyData = {
   }, 
   'lexie' : {
     birthday: '2016-02-14'
+  },
+  'family' : {
+    birthday: '2014-04-28'
   }
 };

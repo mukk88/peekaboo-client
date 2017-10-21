@@ -35,6 +35,7 @@ export const Header = (props: ILoginPage) => {
     >
       <MenuItem primaryText="Liv" onTouchTap={() => { window.location.assign('/baby/liv'); }}/>
       <MenuItem primaryText="Lexie" onTouchTap={() => { window.location.assign('/baby/lexie'); }}/>
+      <MenuItem primaryText="Family" onTouchTap={() => { window.location.assign('/baby/family'); }}/>
     </IconMenu>
   );
 
