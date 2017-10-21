@@ -11,6 +11,7 @@
     "@types/react-router": "^4.0.15",
     "@types/react-router-dom": "^4.0.7",
     "@types/react-tap-event-plugin": "^0.0.30",
+    "@types/scroll-into-view": "^1.6.5",
     "auth0-js": "^8.10.1",
     "aws-sdk": "^2.117.0",
     "exif-js": "^2.3.0",
@@ -26,7 +27,8 @@
     "react-router-dom": "^4.2.2",
     "react-swipe-component": "^1.3.5",
     "react-tap-event-plugin": "^2.0.1",
-    "react-visibility-sensor": "^3.11.0"
+    "react-visibility-sensor": "^3.11.0",
+    "scroll-into-view": "^1.9.1"
   },
   "devDependencies": {
     "@types/jest": "^20.0.8",

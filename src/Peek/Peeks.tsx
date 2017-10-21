@@ -9,6 +9,8 @@ import {
 } from './Common';
 import { baseUri } from '../Config'; 
 import { MediaGroup } from './MediaGroup';
+import { Search } from './Search'; 
+import { BabyData } from './BabyData';
 
 interface IPeeksState {
   mediaData: IMediaData[][];
@@ -82,6 +84,7 @@ class Peeks extends React.Component<RouteComponentProps<{ baby: string }>, IPeek
           key={`media${index}`}
           baby={this.props.match.params.baby}
           mediaData={mediaDataArray}
+          index={index}
         />
       );
     });
@@ -96,6 +99,10 @@ class Peeks extends React.Component<RouteComponentProps<{ baby: string }>, IPeek
           </div>
         </div>
         <div style={{height: '2em'}} />
+        <Search
+          dates={this.state.mediaData.map(mda => new Date(mda[0].date))} 
+          birthday={new Date(BabyData[this.props.match.params.baby].birthday)}
+        />
       </div>
     );
   }

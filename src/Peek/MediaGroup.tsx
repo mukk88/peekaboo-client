@@ -9,6 +9,7 @@ import { getPreSignedUrl } from '../AwsS3';
 interface IMediaGroupProps {
   mediaData: IMediaData[];
   baby: string;
+  index: number;
 } 
 
 interface IMediaGroupState {
@@ -94,18 +95,22 @@ export class MediaGroup extends React.Component<IMediaGroupProps, IMediaGroupSta
     );
 
     return (
-      <VisibilitySensor
-          onChange={this.onVisibleChanged}
-          partialVisibility={true}
+      <div
+        id={`media${this.props.index}`}
       >
-        <Swipe
-          onSwipedLeft={this.onRightTap}
-          onSwipedRight={this.onLeftTap}
-          preventDefaultEvent={false}
+        <VisibilitySensor
+            onChange={this.onVisibleChanged}
+            partialVisibility={true}
         >
-          {mediaDiv}
-        </Swipe>
-      </VisibilitySensor>
+          <Swipe
+            onSwipedLeft={this.onRightTap}
+            onSwipedRight={this.onLeftTap}
+            preventDefaultEvent={false}
+          >
+            {mediaDiv}
+          </Swipe>
+        </VisibilitySensor>
+      </div>
     );
   }
 }    
