@@ -100,7 +100,7 @@ class Peeks extends React.Component<RouteComponentProps<{ baby: string }>, IPeek
         </div>
         <div style={{height: '2em'}} />
         <Search
-          dates={this.state.mediaData.map(mda => new Date(mda[0].date))} 
+          dates={this.state.mediaData.map(mda => (mda[0] ? new Date(mda[0].date) : new Date()))} 
           birthday={new Date(BabyData[this.props.match.params.baby].birthday)}
         />
       </div>
